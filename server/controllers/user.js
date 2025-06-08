@@ -23,7 +23,9 @@ export const register = async (req, res) => {
 
              const activationToken = jwt.sign(
                 {user, otp},
-                process.env.Activation_Secret,
+                process.env.Activation_Secret,{
+                    expiresIn: "5m"
+                }
             )
         await sendMail(
             email,
@@ -41,4 +43,36 @@ export const register = async (req, res) => {
     }
 }
 
-export default register
+export const verifyUser = async(req, res)=>{
+    try {
+        const {otp, activationToken} = req.body;
+
+        const verify= jwt.verify(
+            activationToken,
+            process.env.Activation_Secret
+        );
+        if(!verify)
+            return res.status(400).json({
+                message: "OTP Expired"
+            });
+        if(verify.otp !== otp)
+            return res.status(400).json({
+                message: "Invalid OTP"
+            });
+            
+            await User.create({
+                name: verify.user.name,
+                email: verify.user.email,
+                password: verify.user.password,
+            });
+
+            res.json({
+                message: "User registered successfully",
+            });
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+}
