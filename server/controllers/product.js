@@ -1,4 +1,5 @@
 import { Product } from "../models/product.js";
+import {rm} from "fs";
 
 export const createProduct = async (req, res) => {
     //Only admin can create product
@@ -80,5 +81,69 @@ export const fetchProducts = async (req, res) => {
         res.status(500).json({
             message: error.message,
         });        
+    }
+}
+
+export const fetchSingleProduct = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+
+        res.json({
+            product
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });   
+    }
+}
+
+export const updateStock = async (req, res) => {
+    try {
+        if(!req.user || req.user.role !== 'admin') 
+            return res.status(403).json({
+                message: "You are not authorized to Update a product",
+            });
+        const product = await Product.findById(req.params.id);
+
+        if(req.body.stock){
+            product.stock = req.body.stock;
+            await product.save();
+            return res.json({
+                message: "Stock updated successfully",
+            })
+        }
+
+        res.status(400).json({
+            message: "Please provide stock to update",
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+}
+
+export const deleteProduct = async (req, res) => {
+    try {
+        if(!req.user || req.user.role !== 'admin') 
+            return res.status(403).json({
+                message: "You are not authorized to Update a product",
+            });
+        const product = await Product.findById(req.params.id);
+
+        rm(product.image, (err) => {
+            console.error("image deleted");
+            //this is to delete product image from uploads folder.
+        });
+        
+        await product.deleteOne();
+        res.json({
+            message: "Product deleted successfully",
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });  
     }
 }
