@@ -76,3 +76,50 @@ export const verifyUser = async(req, res)=>{
         });
     }
 }
+
+export const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (!user)
+            return res.status(400).json({
+                message: "Ivalid Credentials",
+            });
+        
+        const matchPassword = await bcrypt.compare(password, user.password);
+        if (!matchPassword)
+            return res.status(400).json({
+                message: "Invalid Credentials",
+            });
+
+            const token = jwt.sign(
+                { id: user._id, email: user.email },
+                process.env.JWT_SECRET,
+                { expiresIn: "10d" }
+            );
+            res.json({
+                message: `Welcome back ${user.name}`,
+                token,
+                user: {
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                },
+            });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+}
+
+export const myProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+        res.json({ user });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });
+    }
+}

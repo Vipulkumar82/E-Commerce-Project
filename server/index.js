@@ -12,9 +12,14 @@ const port = process.env.PORT;
 
 //importing routes
 import userRoutes from './routes/user.js';
+import productRoutes from './routes/product.js';
 
 //using routes
 app.use("/api", userRoutes);
+app.use("/api", productRoutes);
+app.use("/uploads", express.static("uploads"));
+
+
 app.listen(port,()=> {
   console.log(`Server is running on http://localhost:${port}`);
   connectDB();
