@@ -10,12 +10,12 @@ export const createProduct = async (req, res) => {
         
             const {title, description, category, price, stock} = req.body;
 
-            const image = req.file;
+            // const image = req.file;
 
-            if(!image)
-                return res.status(400).json({
-                    message: "Please upload an image",
-                });
+            // if(!image)
+            //     return res.status(400).json({
+            //         message: "Please upload an image",
+            //     });
 
                 const product = await Product.create({
                     title,
@@ -23,7 +23,7 @@ export const createProduct = async (req, res) => {
                     category,
                     price,
                     stock,
-                    image: image?.path,
+                    // image: image?.path,
                 });
 
                 res.status(201).json({
@@ -35,5 +35,50 @@ export const createProduct = async (req, res) => {
             message: error.message,
         });
         
+    }
+}
+
+export const fetchProducts = async (req, res) => {
+    try {
+        const { search, category, price, page } = req.query;
+
+        const filter = {};
+        if (search) {
+            filter.title = { 
+                $regex: search, $options: 'i' 
+            }; // Case-insensitive search
+        }
+        if (category) {
+            filter.category = category;
+        }
+        if(price){
+            filter.price ={
+            $gte: Number(price),
+            }
+        }
+        const countProduct = await Product.countDocuments();
+        const limit = 5; //this means we want to show only 5 product in 1 page
+        const skip = (page - 1) * limit;
+        const totalPages = Math.ceil(countProduct / limit);
+        const products = await Product.find(filter)
+            .limit(limit)
+            .skip(skip)
+            .sort({ createdAt: -1 }); // Sort by createdAt in descending order
+        
+            const categories = await Product.distinct("category");
+            const mostSelling = await Product.find()
+            .sort({ sold: -1 })
+            .limit(3);
+
+        res.json({
+            products,
+            totalPages,
+            categories,
+            mostSelling
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: error.message,
+        });        
     }
 }
