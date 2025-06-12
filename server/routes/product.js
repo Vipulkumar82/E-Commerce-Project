@@ -9,7 +9,7 @@ router.post("/product/new", isAuth, uploadFiles, createProduct);
 router.get("/product/all", fetchProducts);
 router.get("/product/:id", fetchSingleProduct);
 router.put("/product/:id", isAuth, updateStock);
-router.put("/product/:id", isAuth, deleteProduct);
+router.delete("/product/:id", isAuth, deleteProduct);
 
 
 export default router;
