@@ -1,6 +1,6 @@
 import express from 'express';
 import { isAuth } from '../middlewares/isAuth.js';
-import { addAddress } from '../controllers/Address.js';
+import { addAddress } from '../controllers/address.js'; // fixed casing
 
 const router = express.Router();
 

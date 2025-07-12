@@ -11,12 +11,12 @@ export const createProduct = async (req, res) => {
         
             const {title, description, category, price, stock} = req.body;
 
-            // const image = req.file;
+            const image = req.file;
 
-            // if(!image)
-            //     return res.status(400).json({
-            //         message: "Please upload an image",
-            //     });
+            if(!image)
+                return res.status(400).json({
+                    message: "Please upload an image",
+                });
 
                 const product = await Product.create({
                     title,
@@ -24,7 +24,7 @@ export const createProduct = async (req, res) => {
                     category,
                     price,
                     stock,
-                    // image: image?.path,
+                    image: image?.path,
                 });
 
                 res.status(201).json({

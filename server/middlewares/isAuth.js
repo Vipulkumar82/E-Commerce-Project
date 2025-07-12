@@ -17,6 +17,5 @@ export const isAuth = async(req, res, next) => {
         return res.status(403).json({
             message: "Please login to continue",
         });
-        
     }
 }

@@ -14,11 +14,13 @@ const port = process.env.PORT;
 import userRoutes from './routes/user.js';
 import productRoutes from './routes/product.js';
 import cartRoutes from './routes/cart.js';
+import addressRoutes from './routes/address.js';
 
 //using routes
 app.use("/api", userRoutes);
 app.use("/api", productRoutes);
 app.use("/api", cartRoutes);
+app.use("/api", addressRoutes);
 
 app.use("/uploads", express.static("uploads"));
 
